@@ -1,0 +1,342 @@
+<app-admin-sidebar></app-admin-sidebar>
+<div class="container">
+  <div class="header">
+    <h1>📦 Gestión de Productos</h1>
+  </div>
+
+  <div class="content">
+    <!-- Mensajes de estado -->
+    <div class="message-container">
+      <div *ngIf="successMessage" class="alert alert-success">
+        <i class="icon">✅</i>
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="alert alert-error">
+        <i class="icon">❌</i>
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-section">
+      <h2 class="form-title">{{ formTitle }}</h2>
+      <form (ngSubmit)="onSubmit()" #productFormRef="ngForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nombre del Producto:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="productForm.name"
+              required
+              [disabled]="isLoading"
+              placeholder="Ingresa el nombre del producto">
+          </div>
+          <div class="form-group">
+            <label for="price">Precio:</label>
+            <input
+              type="number"
+              id="price"
+              name="price"
+              [(ngModel)]="productForm.price"
+              required
+              min="0"
+              step="0.01"
+              [disabled]="isLoading"
+              placeholder="0.00">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="stock">Stock:</label>
+            <input
+              type="number"
+              id="stock"
+              name="stock"
+              [(ngModel)]="productForm.stock"
+              required
+              min="0"
+              [disabled]="isLoading"
+              placeholder="0">
+          </div>
+          <div class="form-group">
+            <label for="categoryId">Categoría:</label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              [(ngModel)]="productForm.categoryId"
+              required
+              [disabled]="isLoading">
+              <option value="">Selecciona una categoría</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción:</label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="productForm.description"
+            required
+            [disabled]="isLoading"
+            placeholder="Describe el producto..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="imageFile">Imagen del Producto:</label>
+            <div class="file-input-wrapper">
+              <input
+                type="file"
+                id="imageFile"
+                (change)="onFileSelected($event)"
+                accept="image/*"
+                [disabled]="isLoading"
+                class="file-input">
+              <div class="file-input-display">
+                <span *ngIf="!selectedFile">📷 Seleccionar imagen</span>
+                <span *ngIf="selectedFile">📷 {{ selectedFile.name }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="status">Estado:</label>
+            <select
+              id="status"
+              name="status"
+              [(ngModel)]="productForm.status"
+              [disabled]="isLoading">
+              <option [value]="true">Activo</option>
+              <option [value]="false">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isLoading || !productFormRef.form.valid">
+            <span *ngIf="isLoading" class="spinner"></span>
+            {{ submitButtonText }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancelEdit()"
+            [style.display]="isEditing ? 'inline-block' : 'none'"
+            [disabled]="isLoading">
+            ❌ Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="search-section">
+      <h3>🔍 Filtros de Búsqueda</h3>
+      <div class="filters-container">
+        <div class="filter-row">
+          <div class="form-group">
+            <label for="searchName">Nombre:</label>
+            <input
+              type="text"
+              id="searchName"
+              placeholder="Buscar por nombre..."
+              [(ngModel)]="searchFilters.name">
+          </div>
+          <div class="form-group">
+            <label for="searchCategory">Categoría:</label>
+            <select
+              id="searchCategory"
+              [(ngModel)]="searchFilters.categoryId">
+              <option value="">Todas las categorías</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="searchStatus">Estado:</label>
+            <select
+              id="searchStatus"
+              [(ngModel)]="searchFilters.status">
+              <option value="">Todos</option>
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <div class="form-group">
+            <label for="minPrice">Precio Mínimo:</label>
+            <input
+              type="number"
+              id="minPrice"
+              placeholder="0.00"
+              [(ngModel)]="searchFilters.minPrice"
+              min="0"
+              step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="maxPrice">Precio Máximo:</label>
+            <input
+              type="number"
+              id="maxPrice"
+              placeholder="1000.00"
+              [(ngModel)]="searchFilters.maxPrice"
+              min="0"
+              step="0.01">
+          </div>
+          <div class="form-group filter-actions">
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="searchProducts()"
+              [disabled]="isLoading">
+              🔍 Buscar
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="clearSearch()"
+              [disabled]="isLoading">
+              🔄 Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="table-section">
+      <h2>📋 Lista de Productos</h2>
+
+      <div *ngIf="isLoading" class="loading">
+        <div class="spinner"></div>
+        <span>Cargando productos...</span>
+      </div>
+
+      <div class="table-container" *ngIf="!isLoading && hasProducts">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Categoría</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of products; trackBy: trackByProduct">
+              <td>
+                <div class="image-container">
+                  <img
+                    [src]="product.imageUrl"
+                    [alt]="product.name"
+                    class="product-image"
+                    loading="lazy">
+                  <div class="image-overlay">
+                    <span class="view-icon">👁️</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="product-name">{{ product.name }}</div>
+              </td>
+              <td>
+                <div class="product-description" [title]="product.description">
+                  {{ product.description }}
+                </div>
+              </td>
+              <td>
+                <div class="product-price">
+                  {{ product.price | currency:'S/. ':'symbol':'1.2-2' }}
+                </div>
+              </td>
+              <td>
+                <span class="stock-badge" [class]="getStockClass(product.stock)">
+                  {{ product.stock }}
+                </span>
+              </td>
+              <td>
+                <span class="category-badge">{{ product.categoryName }}</span>
+              </td>
+              <td>
+                <span class="status-badge" [class]="getStatusClass(product.status)">
+                  {{ product.status ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="actions">
+                <div class="action-buttons">
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-small"
+                    (click)="editProduct(product.id)"
+                    [disabled]="isLoading"
+                    title="Editar producto">
+                    ✏️
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-small"
+                    (click)="deleteProduct(product.id)"
+                    [disabled]="isLoading"
+                    title="Eliminar producto">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!isLoading && !hasProducts" class="no-data">
+        <div class="no-data-icon">📦</div>
+        <h3>No hay productos disponibles</h3>
+        <p>Agrega tu primer producto usando el formulario de arriba</p>
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination" *ngIf="!isLoading && hasProducts && totalPages > 1">
+        <button
+          class="btn btn-secondary btn-small"
+          (click)="previousPage()"
+          [disabled]="!canGoPrevious">
+          ⬅️ Anterior
+        </button>
+
+        <div class="pagination-numbers">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            class="btn btn-page"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page + 1 }}
+          </button>
+        </div>
+
+        <div class="pagination-info">{{ paginationInfo }}</div>
+
+        <button
+          class="btn btn-secondary btn-small"
+          (click)="nextPage()"
+          [disabled]="!canGoNext">
+          Siguiente ➡️
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,144 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header {
+  background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%);
+  color: white;
+  padding: 30px;
+  text-align: center;
+}
+
+.content {
+  padding: 30px;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 15px;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+.orders-table th {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.orders-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 2px;
+}
+
+.btn-primary {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-small {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.badge.pendiente {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.badge.confirmado {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.badge.enviado {
+  background-color: #007bff;
+  color: white;
+}
+
+.badge.entregado {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge.cancelado {
+  background-color: #dc3545;
+  color: white;
+}
+
+.loading {
+  text-align: center;
+  font-weight: bold;
+  color: #555;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+}
+
+.pagination {
+  text-align: center;
+  margin-top: 20px;
+}

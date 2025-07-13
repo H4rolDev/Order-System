@@ -1,0 +1,168 @@
+<app-admin-sidebar></app-admin-sidebar>
+<div class="container">
+  <div class="header">
+    <h1>🗂️ Gestión de Categorías</h1>
+    <p>Sistema completo de CRUD para categorías</p>
+  </div>
+
+  <div class="content">
+    <!-- Mensajes de estado -->
+    <div class="message-container">
+      <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-section">
+      <h2 class="form-title">{{ formTitle }}</h2>
+      <form (ngSubmit)="onSubmit()" #categoryFormRef="ngForm">
+        <div class="form-group">
+          <label for="name">Nombre de la Categoría:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="categoryForm.name"
+            required
+            [disabled]="isLoading">
+        </div>
+        <div class="form-group">
+          <label for="description">Descripción:</label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="categoryForm.description"
+            required
+            [disabled]="isLoading"></textarea>
+        </div>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || !categoryFormRef.form.valid">
+          {{ submitButtonText }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancelEdit()"
+          [style.display]="isEditing ? 'inline-block' : 'none'"
+          [disabled]="isLoading">
+          ❌ Cancelar
+        </button>
+      </form>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="search-section">
+      <div class="search-group">
+        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+          <label for="search">Buscar categorías:</label>
+          <input
+            type="text"
+            id="search"
+            placeholder="Buscar por nombre..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchChange()">
+        </div>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="searchCategories()"
+          [disabled]="isLoading">
+          🔍 Buscar
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="clearSearch()"
+          [disabled]="isLoading">
+          🔄 Limpiar
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de categorías -->
+    <div class="table-section">
+      <h2>📋 Lista de Categorías</h2>
+
+      <div *ngIf="isLoading" class="loading">
+        ⏳ Cargando categorías...
+      </div>
+
+      <table
+        class="categories-table"
+        *ngIf="!isLoading && hasCategories">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of filteredCategories; trackBy: trackByCategory">
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td>{{ category.description }}</td>
+            <td class="actions">
+              <button
+                type="button"
+                class="btn btn-primary btn-small"
+                (click)="editCategory(category.id)"
+                [disabled]="isLoading"
+                title="Editar categoría">
+                ✏️ Editar
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger btn-small"
+                (click)="deleteCategory(category.id)"
+                [disabled]="isLoading"
+                title="Eliminar categoría">
+                🗑️ Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="!isLoading && !hasCategories" class="no-data">
+        No hay categorías disponibles
+      </div>
+
+      <!-- Paginación -->
+      <div class="pagination" *ngIf="!isLoading && hasCategories && totalPages > 1">
+        <button
+          class="btn btn-secondary btn-small"
+          (click)="previousPage()"
+          [disabled]="!canGoPrevious">
+          ⬅️ Anterior
+        </button>
+
+        <div class="pagination-numbers">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            class="btn btn-page"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{ page + 1 }}
+          </button>
+        </div>
+
+        <span class="pagination-info">{{ paginationInfo }}</span>
+
+        <button
+          class="btn btn-secondary btn-small"
+          (click)="nextPage()"
+          [disabled]="!canGoNext">
+          ➡️ Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<nav class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Header -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <i class="fas fa-shield-alt logo-icon"></i>
+      <h3 class="logo-text">Admin Panel</h3>
+    </div>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- Navigation Menu -->
+  <div class="sidebar-content">
+    <ul class="nav-menu">
+      <li *ngFor="let item of menuItems" class="nav-item">
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          class="nav-link"
+          [title]="item.label"
+        >
+          <i [class]="item.icon" class="nav-icon"></i>
+          <span class="nav-text">{{ item.label }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <div class="user-details">
+        <span class="user-name">Administrador</span>
+        <span class="user-role">{{ userEmail }}</span>
+      </div>
+    </div>
+
+    <button (click)="logout()" class="logout-btn" title="Cerrar sesión">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="logout-text">Cerrar sesión</span>
+    </button>
+  </div>
+</nav>

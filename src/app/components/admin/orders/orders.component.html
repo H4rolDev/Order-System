@@ -1,0 +1,70 @@
+<app-admin-sidebar></app-admin-sidebar>
+<div class="container">
+  <div class="header">
+    <h1>📦 Gestión de Órdenes</h1>
+    <p>Revisa y controla el flujo de pedidos del sistema</p>
+  </div>
+
+  <div class="content">
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+    <div *ngIf="isLoading" class="loading">Cargando órdenes...</div>
+
+    <table *ngIf="!isLoading && orders.length" class="orders-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Productos</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td>{{ order.id }}</td>
+          <td>{{ order.userEmail }}</td>
+          <td>{{ order.date | date: 'short' }}</td>
+          <td>S/. {{ order.totalAmount | number: '1.2-2' }}</td>
+          <td>
+            <span [ngClass]="'badge ' + order.status.toLowerCase()">
+              {{ order.status }}
+            </span>
+          </td>
+          <td>
+            <ul>
+              <li *ngFor="let p of order.orderProducts">
+                {{ p.productName }} x{{ p.quantity }} - S/. {{ p.unitPrice }}
+              </li>
+            </ul>
+          </td>
+          <td>
+            <button class="btn btn-primary btn-small" (click)="confirmOrder(order.id, order.status)" [disabled]="order.status !== 'PENDIENTE'">
+              ✅ Confirmar
+            </button>
+            <button class="btn btn-warning btn-small" (click)="sendOrder(order.id, order.status)" [disabled]="order.status !== 'CONFIRMADO'">
+              🚚 Enviar
+            </button>
+            <button class="btn btn-danger btn-small" (click)="cancelOrder(order.id, order.status)" [disabled]="order.status === 'ENVIADO' || order.status === 'ENTREGADO' || order.status === 'CANCELADO'">
+              ❌ Cancelar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && !orders.length" class="no-data">No hay órdenes disponibles</div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="btn btn-secondary btn-small" (click)="previousPage()" [disabled]="!canGoPrevious">
+        ⬅️ Anterior
+      </button>
+      <button class="btn btn-secondary btn-small" (click)="nextPage()" [disabled]="!canGoNext">
+        ➡️ Siguiente
+      </button>
+    </div>
+  </div>
+</div>

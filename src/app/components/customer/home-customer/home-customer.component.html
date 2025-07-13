@@ -1,0 +1,281 @@
+<div class="app-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1 class="logo">
+        <i class="fas fa-store"></i>
+        Tienda Online
+      </h1>
+      <div class="header-actions">
+        <button class="cart-toggle" (click)="toggleCart()" [class.active]="isCartOpen">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-count" *ngIf="getTotalItems() > 0">{{
+            getTotalItems()
+            }}</span>
+          Carrito
+        </button>
+        <div class="user-menu-container" *ngIf="userEmail; else loginBtn">
+          <button class="user-button" (click)="toggleUserMenu()" title="Usuario">
+            <i class="fas fa-user"></i> {{ userEmail }}
+            <i class="fas fa-caret-down"></i>
+          </button>
+
+          <div class="user-dropdown" *ngIf="showUserMenu">
+            <button class="btn" (click)="goToOrders()">Mis Órdenes</button>
+            <button class="btn logout-btn" (click)="logout()">
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+
+        <ng-template #loginBtn>
+          <button class="btn btn-login" (click)="navigateToLogin()">
+            Iniciar Sesión
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Filters Section -->
+    <section class="filters-section">
+      <div class="filters-container">
+        <h2 class="filters-title">
+          <i class="fas fa-filter"></i>
+          Filtros
+        </h2>
+
+        <form class="filters-form" (ngSubmit)="onFilterSubmit()">
+          <div class="filter-group">
+            <label for="search">Buscar producto</label>
+            <div class="input-with-icon">
+              <i class="fas fa-search"></i>
+              <input id="search" type="text" [(ngModel)]="filterName" name="name" placeholder="Buscar por nombre..."
+                class="filter-input" />
+            </div>
+          </div>
+
+          <div class="filter-group" *ngIf="isLoggedIn">
+            <label for="category">Categoría</label>
+            <select [(ngModel)]="filterCategoryId" name="categoryId" id="category" class="filter-select">
+              <option [ngValue]="null">Todas las categorías</option>
+              <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+            </select>
+          </div>
+
+
+          <div class="filter-group price-group">
+            <label>Rango de precios</label>
+            <div class="price-inputs">
+              <div class="input-with-icon">
+                <span class="currency">S/</span>
+                <input type="number" [(ngModel)]="filterMinPrice" name="minPrice" min="0" placeholder="Mínimo"
+                  class="filter-input price-input" />
+              </div>
+              <span class="price-separator">-</span>
+              <div class="input-with-icon">
+                <span class="currency">S/</span>
+                <input type="number" [(ngModel)]="filterMaxPrice" name="maxPrice" min="0" placeholder="Máximo"
+                  class="filter-input price-input" />
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-search"></i>
+              Filtrar
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="clearFilters()">
+              <i class="fas fa-times"></i>
+              Limpiar
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+      <div class="products-header">
+        <h2 class="products-title">
+          Productos
+          <span class="products-count" *ngIf="totalElements > 0">({{ totalElements }} encontrados)</span>
+        </h2>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading" *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin"></i>
+        Cargando productos...
+      </div>
+
+      <!-- No Products -->
+      <div class="no-products" *ngIf="!isLoading && products.length === 0">
+        <i class="fas fa-box-open"></i>
+        <h3>No hay productos disponibles</h3>
+        <p>Intenta ajustar los filtros o revisa más tarde</p>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="!isLoading && products.length > 0">
+        <div class="product-card" *ngFor="let product of products; trackBy: trackByProductId">
+          <div class="product-image-container">
+            <img [src]="product.imageUrl || 'assets/default-product.png'" [alt]="product.name" class="product-image" />
+            <div class="product-badge" *ngIf="product.stock <= 5 && product.stock > 0">
+              ¡Pocas unidades!
+            </div>
+            <div class="product-badge out-of-stock" *ngIf="product.stock === 0">
+              Sin stock
+            </div>
+          </div>
+
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description">{{ product.description }}</p>
+            <div class="product-category">
+              <i class="fas fa-tag"></i>
+              {{ product.categoryName }}
+            </div>
+            <div class="product-stock">
+              <i class="fas fa-cube"></i>
+              {{ product.stock }} disponibles
+            </div>
+            <div class="product-price">
+              <span class="currency">S/</span>
+              <span class="price">{{ product.price | number : "1.2-2" }}</span>
+            </div>
+          </div>
+
+          <div class="product-actions">
+            <button (click)="addToCart(product)" [disabled]="product.stock === 0" class="btn btn-primary add-to-cart">
+              <i class="fas fa-cart-plus"></i>
+              {{ product.stock === 0 ? "Sin stock" : "Agregar al carrito" }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button (click)="changePage(page - 1)" [disabled]="page === 0" class="btn btn-secondary pagination-btn">
+          <i class="fas fa-chevron-left"></i>
+          Anterior
+        </button>
+
+        <div class="pagination-info">
+          <span>Página {{ page + 1 }} de {{ totalPages }}</span>
+        </div>
+
+        <button (click)="changePage(page + 1)" [disabled]="page + 1 >= totalPages"
+          class="btn btn-secondary pagination-btn">
+          Siguiente
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Cart Sidebar -->
+  <div class="cart-overlay" [class.active]="isCartOpen" (click)="closeCart()"></div>
+  <aside class="cart-sidebar" [class.active]="isCartOpen">
+    <div class="cart-header">
+      <h2>
+        <i class="fas fa-shopping-cart"></i>
+        Carrito de Compras
+      </h2>
+      <button class="close-cart" (click)="closeCart()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="cart-content">
+      <!-- Empty Cart -->
+      <div class="empty-cart" *ngIf="cart.size === 0">
+        <i class="fas fa-shopping-cart"></i>
+        <h3>Tu carrito está vacío</h3>
+        <p>¡Agrega algunos productos para comenzar!</p>
+      </div>
+
+      <!-- Cart Items -->
+      <div class="cart-items" *ngIf="cart.size > 0">
+        <div class="cart-item" *ngFor="let item of cartItems; trackBy: trackByCartItem">
+          <div class="item-image">
+            <img [src]="item.product.imageUrl || 'assets/default-product.png'" [alt]="item.product.name" />
+          </div>
+
+          <div class="item-details">
+            <h4 class="item-name">{{ item.product.name }}</h4>
+            <p class="item-price">
+              S/ {{ item.product.price | number : "1.2-2" }}
+            </p>
+
+            <div class="quantity-controls">
+              <button class="quantity-btn" (click)="decreaseQuantity(item.product.id)" [disabled]="item.quantity <= 1">
+                <i class="fas fa-minus"></i>
+              </button>
+              <span class="quantity">{{ item.quantity }}</span>
+              <button class="quantity-btn" (click)="increaseQuantity(item.product.id)"
+                [disabled]="item.quantity >= item.product.stock">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="item-actions">
+            <div class="item-subtotal">
+              S/ {{ item.product.price * item.quantity | number : "1.2-2" }}
+            </div>
+            <button class="remove-item" (click)="removeFromCart(item.product.id)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary" *ngIf="cart.size > 0">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span>S/ {{ getSubtotal() | number : "1.2-2" }}</span>
+        </div>
+        <div class="summary-row">
+          <span>IGV (18%):</span>
+          <span>S/ {{ getIGV() | number : "1.2-2" }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total a Pagar:</span>
+          <span>S/ {{ getTotal() | number : "1.2-2" }}</span>
+        </div>
+
+        <button class="btn btn-primary checkout-btn" (click)="openOrderModal()">
+          <i class="fas fa-credit-card"></i>
+          Proceder al Pago
+        </button>
+
+      </div>
+    </div>
+  </aside>
+
+
+
+  <!-- Status Messages -->
+  <div class="toast" [class.show]="statusMessage" *ngIf="statusMessage">
+    <i class="fas fa-info-circle"></i>
+    {{ statusMessage }}
+  </div>
+</div>
+
+<!-- Modal de Confirmación de Pedido -->
+<div class="modal-overlay" *ngIf="showOrderModal">
+  <div class="modal">
+    <h3><i class="fas fa-question-circle"></i> ¿Confirmar orden?</h3>
+    <p>¿Estás seguro de que deseas realizar este pedido?</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" (click)="confirmOrder()">Confirmar</button>
+      <button class="btn btn-secondary" (click)="cancelOrder()">Cancelar</button>
+    </div>
+  </div>
+</div>
