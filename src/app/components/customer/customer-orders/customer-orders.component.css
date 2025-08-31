@@ -1,10 +1,8 @@
-/* Reset y base */
 * {
   box-sizing: border-box;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-/* Container principal */
 .orders-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -13,7 +11,6 @@
   min-height: 100vh;
 }
 
-/* Header */
 .page-header {
   margin-bottom: 2rem;
 }
@@ -36,7 +33,6 @@
   gap: 0.5rem;
 }
 
-/* Iconos */
 .icon-orders::before { content: "📋"; }
 .icon-arrow-left::before { content: "←"; }
 .icon-check::before { content: "✓"; }
@@ -54,7 +50,6 @@
 .icon-trash::before { content: "🗑"; }
 .icon-save::before { content: "💾"; }
 
-/* Botones */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -160,7 +155,6 @@
   margin-top: 1rem;
 }
 
-/* Alertas */
 .alert {
   padding: 1rem;
   border-radius: 0.75rem;

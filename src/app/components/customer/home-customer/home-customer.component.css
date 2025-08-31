@@ -1,4 +1,3 @@
-/* Reset y estilos base */
 * {
   margin: 0;
   padding: 0;
@@ -12,14 +11,12 @@ body {
   background-color: #f8f9fa;
 }
 
-/* Layout principal */
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Header */
 .header {
   background: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -83,7 +80,6 @@ body {
   font-weight: 700;
 }
 
-/* Main Content */
 .main-content {
   flex: 1;
   max-width: 1200px;
@@ -92,7 +88,6 @@ body {
   width: 100%;
 }
 
-/* Filters Section */
 .filters-section {
   background: #ffffff;
   padding: 2rem;
@@ -210,7 +205,6 @@ body {
   align-items: center;
 }
 
-/* Buttons */
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
@@ -252,7 +246,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Products Section */
 .products-section {
   background: #ffffff;
   padding: 2rem;
@@ -308,7 +301,6 @@ body {
   margin-bottom: 0.5rem;
 }
 
-/* Products Grid */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -437,7 +429,6 @@ body {
   color: #6c757d;
 }
 
-/* Cart Sidebar */
 .cart-overlay {
   position: fixed;
   top: 0;
@@ -672,7 +663,6 @@ body {
   font-size: 1.1rem;
 }
 
-/* Toast Messages */
 .toast {
   position: fixed;
   bottom: 2rem;
@@ -695,7 +685,6 @@ body {
   opacity: 1;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .header-content {
     padding: 1rem;
@@ -796,7 +785,6 @@ body {
   background-color: #0056b3;
 }
 
-/* Estilos para el menú de usuario */
 .user-menu-container {
   position: relative;
   display: inline-block;
@@ -941,7 +929,6 @@ body {
   font-weight: 900;
 }
 
-/* Responsive para móviles */
 @media (max-width: 768px) {
   .user-button,
   .btn-login {
@@ -960,14 +947,12 @@ body {
   }
 }
 
-/* Estilos para el contenedor de acciones del header */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-/* Estilos para el menú de usuario */
 .user-menu-container {
   position: relative;
   display: inline-block;
