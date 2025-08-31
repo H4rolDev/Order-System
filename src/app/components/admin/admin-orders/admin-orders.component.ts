@@ -2,38 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
+import { OrderFilters, OrderResponse, Order } from '../../../dtos/order.dto';
 import { OrderService } from '../../services/order.service';
-import { OrderFilters, OrderResponse } from '../../../dtos/order.dto';
-import { HttpClient, HttpParams } from '@angular/common/http';
-
-interface OrderProduct {
-  id: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-}
-
-interface Order {
-  id: number;
-  userId: number;
-  userEmail: string;
-  totalAmount: number;
-  date: string;
-  status: 'PENDIENTE' | 'CONFIRMADO' | 'ENVIADO' | 'ENTREGADO' | 'CANCELADO';
-  orderProducts: OrderProduct[];
-}
-
-interface OrdersResponse {
-  totalPages: number;
-  totalElements: number;
-  first: boolean;
-  last: boolean;
-  size: number;
-  content: Order[];
-  number: number;
-  numberOfElements: number;
-}
 
 @Component({
   selector: 'app-admin-orders',

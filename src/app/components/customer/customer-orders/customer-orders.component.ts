@@ -5,6 +5,24 @@ import { formatDate } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+// Interfaces que coinciden con la respuesta del backend
+interface OrderDetail {
+  id: number;
+  productName: string;
+  quantity: number;
+  price: number;
+  subTotal: number;
+}
+
+interface Order {
+  id: number;
+  userEmail: string;
+  total: number;
+  date: string;
+  status: string;
+  orderDetails: OrderDetail[];
+}
+
 @Component({
   selector: 'app-customer-orders',
   standalone: true,
@@ -13,11 +31,11 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./customer-orders.component.css']
 })
 export class CustomerOrdersComponent implements OnInit {
-  orders: any[] = [];
+  orders: Order[] = [];
   statusMessage = '';
   statusType: 'success' | 'error' | 'info' = 'info';
   userEmail: string | null = null;
-  selectedOrder: any = null;
+  selectedOrder: Order | null = null;
   editedItems: { productId: number, quantity: number }[] = [];
   showEditor = false;
   isLoading = false;
@@ -42,7 +60,7 @@ export class CustomerOrdersComponent implements OnInit {
       .set('page', '0')
       .set('size', '1000');
 
-    this.http.get<any>('http://localhost:8080/api/v1/products', { params }).subscribe({
+    this.http.get<any>('https://order-system-446w.onrender.com/api/products', { params }).subscribe({
       next: (res) => {
         // La respuesta tiene la estructura: {content: [...], totalElements: ..., etc}
         if (res && res.content && Array.isArray(res.content)) {
@@ -112,7 +130,7 @@ export class CustomerOrdersComponent implements OnInit {
         .set('dateRangeValid', 'false');
 
       this.http
-        .get<any>('http://localhost:8080/api/v1/orders/customer', { headers, params })
+        .get<any>('https://order-system-446w.onrender.com/api/v1/orders/customer', { headers, params })
         .subscribe({
           next: (res) => {
             this.orders = res.content || [];
@@ -147,7 +165,7 @@ export class CustomerOrdersComponent implements OnInit {
     if (confirm('¿Estás seguro de cancelar esta orden?')) {
       try {
         const headers = this.getAuthHeaders();
-        this.http.put(`http://localhost:8080/api/v1/orders/${orderId}/cancel`, {}, { headers })
+        this.http.put(`https://order-system-446w.onrender.com/api/v1/orders/${orderId}/cancel`, {}, { headers })
           .subscribe({
             next: () => {
               this.showMessage('Orden cancelada correctamente', 'success');
@@ -165,15 +183,23 @@ export class CustomerOrdersComponent implements OnInit {
     }
   }
 
-  editOrder(order: any) {
+  editOrder(order: Order) {
     if (order.status !== 'PENDIENTE') return;
 
     this.selectedOrder = order;
-    this.editedItems = order.orderProducts.map((p: any) => ({
-      productId: p.productId,
-      quantity: p.quantity
+    // IMPORTANTE: Como orderDetails no incluye productId, necesitarás buscar el producto por nombre
+    // o modificar el backend para incluir productId. Por ahora, usaremos el primer producto como fallback
+    this.editedItems = order.orderDetails.map((detail) => ({
+      productId: this.getProductIdByName(detail.productName) || this.allProducts[0]?.id || 0,
+      quantity: detail.quantity
     }));
     this.showEditor = true;
+  }
+
+  // Método auxiliar para encontrar productId por nombre
+  private getProductIdByName(productName: string): number | undefined {
+    const product = this.allProducts.find(p => p.name === productName);
+    return product?.id;
   }
 
   addNewItem() {
@@ -184,34 +210,34 @@ export class CustomerOrdersComponent implements OnInit {
   }
 
   saveChanges() {
-    if (!this.selectedOrder || this.isSaving) return;
+  if (!this.selectedOrder || this.isSaving) return;
 
-    this.isSaving = true;
+  this.isSaving = true;
 
-    try {
-      const headers = this.getAuthHeaders();
-      this.http.put(`http://localhost:8080/api/v1/orders/${this.selectedOrder.id}`, {
-        items: this.editedItems
-      }, { headers })
-      .subscribe({
-        next: () => {
-          this.showMessage('Orden actualizada correctamente', 'success');
-          this.showEditor = false;
-          this.isSaving = false;
-          this.loadOrders();
-        },
-        error: (err) => {
-          console.error('Error al actualizar orden:', err);
-          this.showMessage('Error al actualizar la orden', 'error');
-          this.isSaving = false;
-        }
-      });
-    } catch (error) {
-      console.error('Error al configurar headers para actualizar:', error);
-      this.showMessage('Error de autenticación', 'error');
-      this.isSaving = false;
-    }
+  try {
+    const headers = this.getAuthHeaders();
+    this.http.put(`https://order-system-446w.onrender.com/api/v1/orders/${this.selectedOrder.id}`, {
+      products: this.editedItems  // Cambio: "products" en lugar de "items"
+    }, { headers })
+    .subscribe({
+      next: () => {
+        this.showMessage('Orden actualizada correctamente', 'success');
+        this.showEditor = false;
+        this.isSaving = false;
+        this.loadOrders();
+      },
+      error: (err) => {
+        console.error('Error al actualizar orden:', err);
+        this.showMessage('Error al actualizar la orden', 'error');
+        this.isSaving = false;
+      }
+    });
+  } catch (error) {
+    console.error('Error al configurar headers para actualizar:', error);
+    this.showMessage('Error de autenticación', 'error');
+    this.isSaving = false;
   }
+}
 
   formatDateTime(date: string): string {
     try {
@@ -239,7 +265,9 @@ export class CustomerOrdersComponent implements OnInit {
   getStatusClass(status: string): string {
     switch (status) {
       case 'PENDIENTE': return 'status-pending';
-      case 'COMPLETADO': return 'status-completed';
+      case 'CONFIRMADO': return 'status-confirmed';
+      case 'ENVIADO': return 'status-sent';
+      case 'ENTREGADO': return 'status-delivered';
       case 'CANCELADO': return 'status-cancelled';
       default: return 'status-default';
     }

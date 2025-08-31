@@ -85,6 +85,9 @@ export class HomeCustomerComponent implements OnInit {
   }
 
   openOrderModal() {
+    if(!this.isLoggedIn) {
+      this.navigateToLogin();
+    }
     if (this.cart.size === 0) {
       this.showMessage('No tienes productos en el carrito');
       return;
@@ -97,29 +100,30 @@ export class HomeCustomerComponent implements OnInit {
   }
 
   confirmOrder() {
-    const orderPayload = {
-      items: this.cartItems.map((item) => ({
-        productId: item.product.id,
-        quantity: item.quantity,
-      })),
-    };
+  const orderPayload = {
+    products: this.cartItems.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity,
+    })),
+  };
 
-    this.http
-      .post<any>('http://localhost:8080/api/v1/orders', orderPayload)
-      .subscribe({
-        next: (res) => {
-          this.showMessage('Orden realizada con éxito. ID: ' + res.id);
-          this.cart.clear();
-          this.showOrderModal = false;
-          this.closeCart();
-        },
-        error: (err) => {
-          console.error('Error al crear orden:', err);
-          this.showMessage('Error al realizar la orden');
-          this.showOrderModal = false;
-        },
-      });
-  }
+  this.http
+    .post<any>('https://order-system-446w.onrender.com/api/v1/orders', orderPayload)
+    .subscribe({
+      next: (res) => {
+        this.showMessage('Orden realizada con éxito. ID: ' + res.id);
+        this.cart.clear();
+        this.showOrderModal = false;
+        this.closeCart();
+      },
+      error: (err) => {
+        console.error('Error al crear orden:', err);
+        this.showMessage('Error al realizar la orden');
+        this.showOrderModal = false;
+      },
+    });
+}
+
 
   navigateToLogin() {
     this.router.navigate(['/login']); // Ajusta la ruta según tu configuración de rutas
@@ -166,7 +170,7 @@ export class HomeCustomerComponent implements OnInit {
 
     this.http
       .get<PaginatedResponse<CategoryDto>>(
-        'http://localhost:8080/api/v1/categories?page=0&size=1000'
+        'https://order-system-446w.onrender.com/api/categories?page=0&size=1000'
       )
       .subscribe({
         next: (response) => {
@@ -207,7 +211,7 @@ export class HomeCustomerComponent implements OnInit {
 
     this.http
       .get<PaginatedResponse<ProductDto>>(
-        'http://localhost:8080/api/v1/products',
+        'https://order-system-446w.onrender.com/api/products',
         { params }
       )
       .subscribe({
@@ -356,7 +360,7 @@ export class HomeCustomerComponent implements OnInit {
   }
 
   getTotal(): number {
-    return this.getSubtotal() + this.getIGV();
+    return this.getSubtotal();
   }
 
   getTotalItems(): number {

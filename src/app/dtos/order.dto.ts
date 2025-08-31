@@ -1,20 +1,19 @@
-// order.model.ts
+// order.dto.ts
 export interface Order {
   id: number;
-  userId: number;
   userEmail: string;
-  totalAmount: number;
+  total: number; // Backend usa 'total', no 'totalAmount'
   date: string;
   status: OrderStatus;
-  orderProducts: OrderProduct[];
+  orderDetails: OrderDetail[]; // Backend usa 'orderDetails', no 'orderProducts'
 }
 
-export interface OrderProduct {
+export interface OrderDetail {
   id: number;
-  productId: number;
   productName: string;
   quantity: number;
-  unitPrice: number;
+  price: number; // Backend usa 'price', no 'unitPrice'
+  subTotal: number;
 }
 
 export type OrderStatus = 'PENDIENTE' | 'CONFIRMADO' | 'ENVIADO' | 'ENTREGADO' | 'CANCELADO';

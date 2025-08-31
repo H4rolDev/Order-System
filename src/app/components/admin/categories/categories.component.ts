@@ -53,7 +53,7 @@ interface CategoriesResponse {
   styleUrls: ['./categories.component.css'],
 })
 export class CategoriesComponent implements OnInit {
-  private baseUrl = 'http://localhost:8080/api/v1/categories';
+  private baseUrl = 'https://order-system-446w.onrender.com/api/categories';
 
   categories: Category[] = [];
   filteredCategories: Category[] = [];

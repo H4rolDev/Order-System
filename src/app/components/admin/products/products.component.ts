@@ -78,8 +78,8 @@ interface ProductsResponse {
   styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
-  private baseUrl = 'http://localhost:8080/api/v1/products';
-  private categoriesUrl = 'http://localhost:8080/api/v1/categories';
+  private baseUrl = 'https://order-system-446w.onrender.com/api/products';
+  private categoriesUrl = 'https://order-system-446w.onrender.com/api/categories';
 
   products: Product[] = [];
   categories: Category[] = [];

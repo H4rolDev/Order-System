@@ -8,15 +8,6 @@
   <div class="filters">
     <div class="filters-grid">
       <div class="filter-group">
-        <label for="userIdFilter">ID de Usuario</label>
-        <input
-          type="number"
-          id="userIdFilter"
-          [(ngModel)]="filters.userId"
-          placeholder="Ingresa ID de usuario">
-      </div>
-
-      <div class="filter-group">
         <label for="statusFilter">Estado</label>
         <select id="statusFilter" [(ngModel)]="filters.status">
           <option *ngFor="let option of statusOptions" [value]="option.value">
@@ -27,19 +18,12 @@
 
       <div class="filter-group">
         <label for="startDateFilter">Fecha Inicio</label>
-        <input
-          type="date"
-          id="startDateFilter"
-          [(ngModel)]="filters.startDate"
-          (change)="onStartDateChange()">
+        <input type="date" id="startDateFilter" [(ngModel)]="filters.startDate" (change)="onStartDateChange()">
       </div>
 
       <div class="filter-group">
         <label for="endDateFilter">Fecha Fin</label>
-        <input
-          type="date"
-          id="endDateFilter"
-          [(ngModel)]="filters.endDate">
+        <input type="date" id="endDateFilter" [(ngModel)]="filters.endDate">
       </div>
     </div>
 
@@ -50,27 +34,22 @@
   </div>
 
   <div class="content">
-    <!-- Alert Messages -->
     <div *ngIf="alertMessage" class="alert" [class.alert-success]="alertType === 'success'" [class.alert-error]="alertType === 'error'">
       {{ alertMessage }}
     </div>
 
-    <!-- Loading State -->
     <div *ngIf="loading" class="loading">
       <div class="spinner"></div>
       <p>Cargando órdenes...</p>
     </div>
 
-    <!-- Orders Content -->
     <div *ngIf="!loading">
-      <!-- Empty State -->
       <div *ngIf="orders.length === 0" class="empty-state">
         <div class="empty-state-icon">📦</div>
         <h3>No se encontraron órdenes</h3>
         <p>No hay órdenes que coincidan con los filtros seleccionados</p>
       </div>
 
-      <!-- Orders Grid -->
       <div *ngIf="orders.length > 0" class="orders-grid">
         <div *ngFor="let order of orders" class="order-card">
           <div class="order-header">
@@ -87,7 +66,7 @@
             </div>
             <div class="info-item">
               <div class="info-label">Total</div>
-              <div class="info-value">S/.{{ order.totalAmount }}</div>
+              <div class="info-value">S/.{{ order.total }}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Fecha</div>
@@ -97,72 +76,47 @@
 
           <div class="order-products">
             <div class="products-header">Productos</div>
-            <div *ngFor="let product of order.orderProducts" class="product-item">
+            <div *ngFor="let product of order.orderDetails" class="product-item">
               <div class="product-info">
                 <div class="product-name">{{ product.productName }}</div>
                 <div class="product-details">
-                  Cantidad: {{ product.quantity }} | Precio: S/.{{ product.unitPrice }}
+                  Cantidad: {{ product.quantity }} | Precio: S/.{{ product.price }}
                 </div>
               </div>
             </div>
           </div>
 
           <div class="order-actions">
-            <button
-              *ngIf="canConfirm(order.status)"
-              class="btn btn-success"
-              (click)="confirmOrder(order.id)">
+            <button *ngIf="canConfirm(order.status)" class="btn btn-success" (click)="confirmOrder(order.id)">
               Confirmar
             </button>
 
-            <button
-              *ngIf="canCancel(order.status)"
-              class="btn btn-danger"
-              (click)="cancelOrder(order.id)">
+            <button *ngIf="canCancel(order.status)" class="btn btn-danger" (click)="cancelOrder(order.id)">
               Cancelar
             </button>
 
-            <button
-              *ngIf="canSend(order.status)"
-              class="btn btn-warning"
-              (click)="sendOrder(order.id)">
+            <button *ngIf="canSend(order.status)" class="btn btn-warning" (click)="sendOrder(order.id)">
               Enviar
             </button>
 
-            <button
-              *ngIf="canDeliver(order.status)"
-              class="btn btn-info"
-              (click)="deliverOrder(order.id)">
+            <button *ngIf="canDeliver(order.status)" class="btn btn-info" (click)="deliverOrder(order.id)">
               Entregar
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Pagination -->
       <div *ngIf="totalPages > 1" class="pagination">
-        <button
-          [disabled]="currentPage === 0"
-          (click)="changePage(currentPage - 1)">
-          ← Anterior
-        </button>
+        <button [disabled]="currentPage === 0" (click)="changePage(currentPage - 1)">← Anterior</button>
 
-        <button
-          *ngFor="let page of getPageNumbers()"
-          [class.active]="page === currentPage"
-          (click)="changePage(page)">
+        <button *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage" (click)="changePage(page)">
           {{ page + 1 }}
         </button>
 
-        <button
-          [disabled]="currentPage >= totalPages - 1"
-          (click)="changePage(currentPage + 1)">
-          Siguiente →
-        </button>
+        <button [disabled]="currentPage >= totalPages - 1" (click)="changePage(currentPage + 1)">Siguiente →</button>
 
         <div class="page-info">
-          Página {{ currentPage + 1 }} de {{ totalPages }}
-          ({{ totalElements }} elementos)
+          Página {{ currentPage + 1 }} de {{ totalPages }} ({{ totalElements }} elementos)
         </div>
       </div>
     </div>

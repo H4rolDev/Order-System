@@ -58,14 +58,14 @@
           <div class="detail-item">
             <i class="icon-money"></i>
             <span class="detail-label">Total:</span>
-            <span class="detail-value price">S/ {{ order.totalAmount }}</span>
+            <span class="detail-value price">S/ {{ order.total }}</span>
           </div>
         </div>
 
         <div class="order-products">
           <h4 class="products-title">Productos:</h4>
           <div class="products-list">
-            <div class="product-item" *ngFor="let item of order.orderProducts">
+            <div class="product-item" *ngFor="let item of order.orderDetails">
               <span class="product-name">{{ item.productName }}</span>
               <span class="product-quantity">x{{ item.quantity }}</span>
             </div>

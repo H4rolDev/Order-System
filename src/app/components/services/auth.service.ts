@@ -7,8 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
-  private loginUrl = 'http://localhost:8080/api/v1/auth/login';
-  private registerUrl = 'http://localhost:8080/api/v1/auth/register-customer';
+  private loginUrl = 'https://order-system-446w.onrender.com/api/v1/auth/login';
+  private registerUrl = 'https://order-system-446w.onrender.com/api/v1/auth/register-customer';
 
   constructor(private http: HttpClient) {}
 
@@ -21,7 +21,7 @@ export class AuthService {
   }
 
   registerAdmin(email: string, password: string): Observable<any> {
-    return this.http.post('http://localhost:8080/api/v1/auth/register', {
+    return this.http.post('https://order-system-446w.onrender.com/api/v1/auth/register', {
       email,
       password,
       rol: 'ADMIN'

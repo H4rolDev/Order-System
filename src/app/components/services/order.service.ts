@@ -12,7 +12,7 @@ export interface OrderItemUpdateDto {
   providedIn: 'root'
 })
 export class OrderService {
-  private baseUrl = 'http://localhost:8080/api/v1/orders';
+  private baseUrl = 'https://order-system-446w.onrender.com/api/v1/orders';
 
   constructor(private http: HttpClient) {}
 

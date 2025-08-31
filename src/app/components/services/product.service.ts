@@ -7,7 +7,7 @@ import { ProductDto } from '../../dtos/product.dto';
   providedIn: 'root'
 })
 export class ProductService {
-  private baseUrl = 'http://localhost:8080/api/v1/products';
+  private baseUrl = 'https://order-system-446w.onrender.com/api/products';
 
   constructor(private http: HttpClient) {}
 

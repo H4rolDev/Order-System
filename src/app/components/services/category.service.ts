@@ -27,7 +27,7 @@ interface PagedResponse<T> {
   providedIn: 'root'
 })
 export class CategoryService {
-  private baseUrl = 'http://localhost:8080/api/v1/categories';
+  private baseUrl = 'https://order-system-446w.onrender.com/api/categories';
 
   constructor(private http: HttpClient) {}
 
