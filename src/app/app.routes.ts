@@ -13,12 +13,12 @@ import { CustomerOrdersComponent } from './components/customer/customer-orders/c
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'customer/home-customer', component: HomeCustomerComponent},
+  { path: '', component: HomeCustomerComponent},
   { path: 'customer/orders', component: CustomerOrdersComponent, canActivate: [AuthGuard] },
   { path: 'admin/products',  component: ProductsComponent, canActivate: [AdminGuard] },
   { path: 'admin/categories',  component: CategoriesComponent, canActivate: [AdminGuard] },
   { path: 'admin/home-admin',  component: HomeAdminComponent, canActivate: [AdminGuard] },
   { path: 'admin/orders', component: AdminOrdersComponent, canActivate: [AdminGuard]},
-  { path: '', redirectTo: 'customer/home-customer', pathMatch: 'full' },
-  { path: '**', redirectTo: 'customer/home-customer' }
+  { path: '', redirectTo: '', pathMatch: 'full' },
+  { path: '**', redirectTo: '' }
 ];

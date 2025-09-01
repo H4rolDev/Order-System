@@ -10,21 +10,23 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  priceDiscount?: number;
   stock: number;
-  status: boolean;
-  categoryId: number;
+  brandName?: string;
   categoryName: string;
-  imageUrl: string;
+  storeName?: string;
+  images: { url: string }[];
 }
 
 interface ProductRequest {
   name: string;
   description: string;
   price: number;
+  priceDiscount: number;
   stock: number;
-  status: boolean;
-  categoryId: number;
-  imageUrl: string;
+  brandName: string;
+  categoryId: number; // Cambiado a categoryId como número
+  images?: { url: string }[];
 }
 
 interface Category {
@@ -84,14 +86,17 @@ export class ProductsComponent implements OnInit {
   products: Product[] = [];
   categories: Category[] = [];
 
-  productForm: ProductRequest = {
+  // Formulario para la vista
+  productForm = {
     name: '',
     description: '',
     price: 0,
+    priceDiscount: 0,
     stock: 0,
-    status: true,
+    brandName: '',
     categoryId: 0,
-    imageUrl: '',
+    storeName: '', // Agregado para el formulario (no se envía a la API)
+    images: [] as { url: string }[]
   };
 
   searchFilters: ProductSearchFilters = {};
@@ -175,19 +180,20 @@ export class ProductsComponent implements OnInit {
     this.isLoading = true;
     this.clearMessages();
 
-    const formData = new FormData();
-    formData.append('name', this.productForm.name);
-    formData.append('description', this.productForm.description);
-    formData.append('price', this.productForm.price.toString());
-    formData.append('stock', this.productForm.stock.toString());
-    formData.append('status', this.productForm.status.toString());
-    formData.append('categoryId', this.productForm.categoryId.toString());
+    // Preparar el objeto para enviar según la API
+    const productData: ProductRequest = {
+      name: this.productForm.name,
+      description: this.productForm.description || '', // Enviar string vacío si no hay descripción
+      price: this.productForm.price,
+      priceDiscount: this.productForm.priceDiscount || 0,
+      stock: this.productForm.stock,
+      brandName: this.productForm.brandName || '', // Requerido por la API
+      categoryId: this.productForm.categoryId
+    };
 
-    if (this.selectedFile) {
-      formData.append('imageUrl', this.selectedFile);
-    }
-
-    this.http.post<Product>(this.baseUrl, formData).subscribe({
+    this.http.post<Product>(this.baseUrl, productData, {
+      headers: { 'Content-Type': 'application/json' }
+    }).subscribe({
       next: () => {
         this.showSuccessMessage('Producto creado exitosamente');
         this.resetForm();
@@ -206,19 +212,19 @@ export class ProductsComponent implements OnInit {
     this.isLoading = true;
     this.clearMessages();
 
-    const formData = new FormData();
-    formData.append('name', this.productForm.name);
-    formData.append('description', this.productForm.description);
-    formData.append('price', this.productForm.price.toString());
-    formData.append('stock', this.productForm.stock.toString());
-    formData.append('status', this.productForm.status.toString());
-    formData.append('categoryId', this.productForm.categoryId.toString());
+    const productData: ProductRequest = {
+      name: this.productForm.name,
+      description: this.productForm.description || '',
+      price: this.productForm.price,
+      priceDiscount: this.productForm.priceDiscount || 0,
+      stock: this.productForm.stock,
+      brandName: this.productForm.brandName || '',
+      categoryId: this.productForm.categoryId
+    };
 
-    if (this.selectedFile) {
-      formData.append('imageUrl', this.selectedFile);
-    }
-
-    this.http.put<Product>(`${this.baseUrl}/${this.editingId}`, formData).subscribe({
+    this.http.put<Product>(`${this.baseUrl}/${this.editingId}`, productData, {
+      headers: { 'Content-Type': 'application/json' }
+    }).subscribe({
       next: () => {
         this.showSuccessMessage('Producto actualizado exitosamente');
         this.resetForm();
@@ -257,14 +263,19 @@ export class ProductsComponent implements OnInit {
 
     this.http.get<Product>(`${this.baseUrl}/${id}`).subscribe({
       next: (product) => {
+        // Buscar el categoryId basado en el categoryName
+        const category = this.categories.find(cat => cat.name === product.categoryName);
+
         this.productForm = {
           name: product.name,
           description: product.description,
           price: product.price,
+          priceDiscount: product.priceDiscount || 0,
           stock: product.stock,
-          status: product.status,
-          categoryId: product.categoryId,
-          imageUrl: product.imageUrl,
+          brandName: product.brandName || '',
+          categoryId: category ? category.id : 0,
+          storeName: product.storeName || '', // Agregado para el formulario
+          images: product.images || [],
         };
         this.isEditing = true;
         this.editingId = id;
@@ -291,11 +302,6 @@ export class ProductsComponent implements OnInit {
       return false;
     }
 
-    if (!this.productForm.description.trim()) {
-      this.showErrorMessage('La descripción es requerida');
-      return false;
-    }
-
     if (this.productForm.price < 0) {
       this.showErrorMessage('El precio debe ser mayor o igual a 0');
       return false;
@@ -306,7 +312,7 @@ export class ProductsComponent implements OnInit {
       return false;
     }
 
-    if (!this.productForm.categoryId) {
+    if (!this.productForm.categoryId || this.productForm.categoryId === 0) {
       this.showErrorMessage('Debe seleccionar una categoría');
       return false;
     }
@@ -319,10 +325,12 @@ export class ProductsComponent implements OnInit {
       name: '',
       description: '',
       price: 0,
+      priceDiscount: 0,
       stock: 0,
-      status: true,
+      brandName: '',
       categoryId: 0,
-      imageUrl: '',
+      storeName: '', // Agregado para el formulario
+      images: [],
     };
     this.isEditing = false;
     this.editingId = null;
@@ -404,12 +412,6 @@ export class ProductsComponent implements OnInit {
       this.clearMessages();
     }, 5000);
   }
-
-  // Manejo de errores de imagen
-  // onImageError(event: Event): void {
-  //   const target = event.target as HTMLImageElement;
-  //   target.src = 'assets/no-image.png';
-  // }
 
   getStockClass(stock: number): string {
     if (stock === 0) return 'stock-empty';
